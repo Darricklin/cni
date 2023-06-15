@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"k8s.io/klog"
+	"os"
 	"strings"
 )
 
@@ -138,5 +139,59 @@ func (t *dispatcher) pluginMain(cmdAdd, cmdCheck, cmdDel func(_ *CmdArgs) error,
 		if err = utils.ValidateInterfaceName(cmdArgs.IfName); err != nil {
 			return err
 		}
+	}
+	switch cmd {
+	case "ADD":
+		err = t.checkVersionAndCall(cmdArgs, versionInfo, cmdAdd)
+	case "CHECK":
+		configVersion, err := t.ConfVersionDecoder.Decode(cmdArgs.StdinData)
+		if err != nil {
+			return types.NewError(types.ErrDecodingFailure, err.Error(), "")
+		}
+		if gtet, err := version.GreaterThanOrEqualTo(configVersion, "0.4.0"); err != nil {
+			return types.NewError(types.ErrDecodingFailure, err.Error(), "")
+		} else if !gtet {
+			return types.NewError(types.ErrIncompatibleCNIVersion, "config version does not allow CHECK", "")
+		}
+		for _, pluginVersion := range versionInfo.SupportedVersions() {
+			gtet, err := version.GreaterThanOrEqualTo(pluginVersion, configVersion)
+			if err != nil {
+				return types.NewError(types.ErrDecodingFailure, err.Error(), "")
+			} else if gtet {
+				if err := t.checkVersionAndCall(cmdArgs, versionInfo, cmdCheck); err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+	case "DEL":
+		err = t.checkVersionAndCall(cmdArgs, versionInfo, cmdDel)
+	case "VERSION":
+		if err := versionInfo.Encode(t.Stdout); err != nil {
+			return types.NewError(types.ErrIOFailure, err.Error(), "")
+		}
+	default:
+		return types.NewError(types.ErrInvalidEnvironmentVariables, fmt.Sprintf("unknown CNI_COMMAND : %v", cmd), "")
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func PluginMainWithError(cmdAdd, cmdCheck, cmdDel func(_ *CmdArgs) error, versionInfo version.PluginInfo, about string) *types.Error {
+	return (&dispatcher{
+		Getenv: os.Getenv,
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}).pluginMain(cmdAdd, cmdCheck, cmdDel, versionInfo, about)
+}
+func PluginMain(cmdAdd, cmdCheck, cmdDel func(_ *CmdArgs) error, versionInfo version.PluginInfo, about string) {
+	if e := PluginMainWithError(cmdAdd, cmdCheck, cmdDel, versionInfo, about); e != nil {
+		if err := e.Print(); err != nil {
+			klog.Errorf("Error write in error Json to stdout : ", err)
+		}
+		os.Exit(1)
 	}
 }

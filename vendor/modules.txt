@@ -1,4 +1,4 @@
-# github.com/containernetworking/cni v1.0.1
+# github.com/containernetworking/cni v1.1.2
 ## explicit; go 1.14
 github.com/containernetworking/cni/pkg/types
 github.com/containernetworking/cni/pkg/types/020
@@ -8,6 +8,9 @@ github.com/containernetworking/cni/pkg/types/create
 github.com/containernetworking/cni/pkg/types/internal
 github.com/containernetworking/cni/pkg/utils
 github.com/containernetworking/cni/pkg/version
+# github.com/containernetworking/plugins v1.3.0
+## explicit; go 1.20
+github.com/containernetworking/plugins/pkg/utils/buildversion
 # k8s.io/klog v1.0.0
 ## explicit; go 1.12
 k8s.io/klog

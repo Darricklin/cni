@@ -4,18 +4,20 @@ import (
 	"cni/skel"
 	"cni/utils/log"
 	"fmt"
+	"github.com/containernetworking/cni/pkg/version"
+	bv "github.com/containernetworking/plugins/pkg/utils/buildversion"
 	"os"
 )
 
 func cmdAdd(args *skel.CmdArgs) error {
-
+	return nil
 }
 func cmdDel(args *skel.CmdArgs) error {
-
+	return nil
 }
 
 func cmdCheck(args *skel.CmdArgs) error {
-
+	return nil
 }
 func main() {
 	if err := log.InitLogs(); err != nil {
@@ -23,5 +25,5 @@ func main() {
 		os.Exit(1)
 	}
 	defer log.FlushLogs()
-	skel.PluginMain(cmdAdd, cmdCheck, cmdDel, version.All, bv.buildString("cni"))
+	skel.PluginMain(cmdAdd, cmdCheck, cmdDel, version.All, bv.BuildString("cni"))
 }
