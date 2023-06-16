@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"github.com/containernetworking/cni/pkg/version"
 	bv "github.com/containernetworking/plugins/pkg/utils/buildversion"
+	"k8s.io/klog"
 	"os"
 )
 
 func cmdAdd(args *skel.CmdArgs) error {
+	klog.Infof("start cmdAdd")
+
 	return nil
 }
 func cmdDel(args *skel.CmdArgs) error {
