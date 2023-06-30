@@ -1,5 +1,7 @@
 package etcd
 
+import "net"
+
 type Node struct {
 	Name   string `json:"name"`
 	NodeIp string `json:"nodeIp"`
@@ -10,15 +12,23 @@ type NetworkCrd struct {
 }
 
 type Subnet struct {
-	Name         string `json:"name"`
-	ID           string `json:"id"`
-	CIDR         string `json:"cidr"`
-	AllocatedIps []AllocatedIp
+	Name string `json:"name"`
+	ID   string `json:"id"`
+	CIDR string `json:"cidr"`
 }
 
 type AllocatedIp struct {
-	Ip   string `json:"ip"`
-	Port string `json:"port"`
+	Ip string `json:"ip"`
+}
+type FreeIp struct {
+	Ip string `json:"ip"`
+}
+type PoolData struct {
+	Name         string        `json:"name"`
+	Id           string        `json:"id"`
+	Pool         *net.IPNet    `json:"pool"`
+	FreeIps      []FreeIp      `json:"free_ips"`
+	AllocatedIps []AllocatedIp `json:"allocated_ips"`
 }
 
 type Pod struct {

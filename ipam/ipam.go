@@ -4,6 +4,7 @@ import (
 	"cni/client"
 	"cni/etcd"
 	"cni/helper"
+	"github.com/containernetworking/plugins/pkg/ip"
 	"k8s.io/klog/v2"
 	"sync"
 )
@@ -91,4 +92,10 @@ func GetLightK8sClient() *client.LightK8sClient {
 	return k8sClient
 }
 
-func CreateNetworkCrd()
+func CreateNetworkCrd() {}
+
+func AllocationIpFromNetwork(network string) (ipaddr, gw ip.IP, err error) {
+	ipaddr = ip.IP{}
+	gw = ip.IP{}
+	return ipaddr, gw, nil
+}
